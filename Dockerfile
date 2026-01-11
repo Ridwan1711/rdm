@@ -6,6 +6,12 @@ FROM php:7.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
+# Update sources.list untuk menggunakan archive repository (Debian Buster EOL)
+# Debian Buster sudah EOL, repository dipindahkan ke archive
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list \
+    && echo "deb http://archive.debian.org/debian buster-updates main" >> /etc/apt/sources.list \
+    && echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/99no-check-valid-until
+
 # Install system dependencies dan extensions
 RUN apt-get update && apt-get install -y \
     curl \

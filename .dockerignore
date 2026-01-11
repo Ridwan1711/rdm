@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+application/logs/*.log
+
+# Cache
+application/cache/*
+!application/cache/index.html
+!application/cache/.htaccess
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node modules (jika ada)
+node_modules
+
+# Vendor (jika tidak diperlukan di image)
+# vendor

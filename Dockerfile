@@ -47,9 +47,8 @@ RUN cd /tmp \
     && echo "zend_extension=ioncube.so" > /usr/local/etc/php/conf.d/00-ioncube.ini \
     && rm -rf /tmp/ioncube*
 
-# Enable PHP extensions dan settings
-RUN docker-php-ext-enable curl \
-    && echo "extension=curl.so" >> /usr/local/etc/php/php.ini
+# CURL sudah built-in ke PHP, tidak perlu di-enable
+# Verifikasi dengan: php -m | grep curl
 
 # Configure PHP settings
 RUN echo "allow_url_fopen = On" >> /usr/local/etc/php/php.ini \

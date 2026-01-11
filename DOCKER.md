@@ -7,6 +7,7 @@ File Docker ini dibuat untuk memenuhi syarat hosting RDM:
 - ✅ allow_url_fopen enabled
 - ✅ CURL aktif
 - ✅ Apache dengan mod_rewrite
+- ✅ PostgreSQL Database
 
 ## Struktur File
 
@@ -34,7 +35,7 @@ docker-compose down -v
 
 Setelah container berjalan:
 - **Aplikasi RDM**: http://localhost:8080
-- **phpMyAdmin**: http://localhost:8081
+- **pgAdmin**: http://localhost:8081
 
 ### 2. Build dan Run Manual
 
@@ -53,13 +54,15 @@ docker run -d \
 ## Konfigurasi Database
 
 1. Edit file `application/config/database.php`:
-   - `hostname`: `db` (jika menggunakan docker-compose) atau IP database server
+   - `hostname`: `db` (jika menggunakan docker-compose) atau IP database server PostgreSQL
    - `username`: `rdm_user` (atau sesuai konfigurasi)
    - `password`: `rdm_password` (atau sesuai konfigurasi)
    - `database`: `rdm_database` (atau sesuai konfigurasi)
+   - `dbdriver`: `postgre` (PostgreSQL driver)
 
 2. Untuk docker-compose, database credentials default:
-   - Host: `db`
+   - Host: `db` (atau `localhost:5432` dari host)
+   - Port: `5432`
    - Username: `rdm_user`
    - Password: `rdm_password`
    - Database: `rdm_database`
@@ -70,11 +73,16 @@ Anda bisa mengubah konfigurasi database di `docker-compose.yml` pada section `db
 
 ```yaml
 environment:
-  MYSQL_ROOT_PASSWORD: your_root_password
-  MYSQL_DATABASE: your_database_name
-  MYSQL_USER: your_username
-  MYSQL_PASSWORD: your_password
+  POSTGRES_USER: your_username
+  POSTGRES_PASSWORD: your_password
+  POSTGRES_DB: your_database_name
 ```
+
+**Catatan Penting:**
+- Database sekarang menggunakan **PostgreSQL** (bukan MySQL)
+- Pastikan aplikasi Anda kompatibel dengan PostgreSQL
+- Jika Anda memiliki database MySQL yang sudah ada, Anda perlu melakukan migrasi ke PostgreSQL
+- CodeIgniter menggunakan driver `postgre` untuk PostgreSQL
 
 ## Troubleshooting
 
@@ -127,6 +135,29 @@ Untuk production, disarankan:
 
 ## Catatan
 
-- Port default: 8080 (web), 8081 (phpMyAdmin), 3306 (MySQL)
+- Port default: 8080 (web), 8081 (pgAdmin), 5432 (PostgreSQL)
 - Volume untuk config, logs, dan cache sudah di-mount untuk persist data
 - Database data tersimpan di Docker volume `db_data`
+
+## Migrasi dari MySQL ke PostgreSQL
+
+Jika Anda memiliki database MySQL yang sudah ada dan ingin migrasi ke PostgreSQL:
+
+1. **Export data dari MySQL:**
+   ```bash
+   mysqldump -u username -p database_name > mysql_export.sql
+   ```
+
+2. **Konversi SQL ke format PostgreSQL:**
+   - Gunakan tool seperti `pgloader` atau manual conversion
+   - Beberapa syntax MySQL tidak kompatibel dengan PostgreSQL
+
+3. **Import ke PostgreSQL:**
+   ```bash
+   psql -U rdm_user -d rdm_database < converted_export.sql
+   ```
+
+**Alternatif:** Gunakan tool seperti `pgloader` untuk migrasi otomatis:
+```bash
+pgloader mysql://user:pass@host/dbname postgresql://rdm_user:rdm_password@localhost/rdm_database
+```
